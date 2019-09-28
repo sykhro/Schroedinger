@@ -15,16 +15,15 @@ Numerov::Numerov(Potential potential, int nbox) : Solver(std::move(potential), n
    where V(x) is the potential and E the eigenenergy
 */
 void Numerov::functionSolve(double energy, std::vector<double> potential_values, std::vector<double> &wavefunction) {
-    std::vector<double> pot = this->potential.getValues();
 
     double c = (2.0 * mass / hbar / hbar) * (dx * dx / 12.0);
     try {
         // Build Numerov f(x) solution from left.
         for (int i = 2; i <= this->nbox; i++) {
             double &value = wavefunction.at(i);
-            double &pot_1 = pot.at(i - 1);
-            double &pot_2 = pot.at(i - 2);
-            double &pot_a = pot.at(i);
+            double &pot_1 = potential_values.at(i - 1);
+            double &pot_2 = potential_values.at(i - 2);
+            double &pot_a = potential_values.at(i);
 
             double &wave_1 = wavefunction.at(i - 1);
             double &wave_2 = wavefunction.at(i - 2);
@@ -55,23 +54,17 @@ void Numerov::functionSolve(double energy, std::vector<double> potential_values,
 */
 
 State Numerov::solve(double e_min, double e_max, double e_step) {
-    double energy = 0.0;
-    int n, sign;
-    std::vector<Potential> potentials;
+
+    int number_of_dimension = 0;
     std::vector<State> states;
 
-    if (this->potential.isSeparated()) {
-            potentials = this->potential.getSeparatedPotentials();
-    } else {
-        potentials.push_back(this->potential); 
-    }
-
-    for (Potential local_potential : potentials) {
-
+    for (std::vector<double> local_potential : potential.getValues()) {
+        double energy = 0.0;
+        int n, sign;
         double solutionEnergy = 0.0;
         double wfAtBoundary;
-        std::vector<double> wavefunction = std::vector<double>(nbox + 1);
-        std::vector<double> probability = std::vector<double>(nbox + 1);
+        std::vector<double> wavefunction = std::vector<double>(nbox + 1, 0);
+        std::vector<double> probability  = std::vector<double>(nbox + 1, 0);
         
         // Initialization of wavefunction
         switch (this->boundary) {
@@ -88,7 +81,7 @@ State Numerov::solve(double e_min, double e_max, double e_step) {
         // scan energies to find when the Numerov solution is = 0 at the right extreme of the box.
         for (n = 0; n < (e_max - e_min) / e_step; n++) {
             energy = e_min + n * e_step;
-            this->functionSolve(energy, local_potential.getValues(), wavefunction);
+            this->functionSolve(energy, local_potential, wavefunction);
             double &last_wavefunction_value = wavefunction.at(this->nbox);
 
             if (fabs(last_wavefunction_value - wfAtBoundary) < err_thres) {
@@ -105,18 +98,48 @@ State Numerov::solve(double e_min, double e_max, double e_step) {
             // calls bisection rule.
             if (sign * (last_wavefunction_value - wfAtBoundary) < 0) {
                 INFO("Bisection {}", last_wavefunction_value);
-                solutionEnergy = this->bisection(energy - e_step, energy + e_step, local_potential.getValues(), wavefunction, wfAtBoundary);
+                solutionEnergy = this->bisection(energy - e_step, energy + e_step, local_potential, wavefunction, wfAtBoundary);
                 break;
             }
         }
 
-        states.push_back(State(wavefunction, local_potential, solutionEnergy,
-                    local_potential.getBase(), nbox));
+
+        // Evaluation of the probability
+        for (int i = 0; i <= nbox; i++) {
+            double &value      = wavefunction[i];
+            double &prob_value = probability[i];
+            prob_value         = value * value;
+        }
+
+        // Evaluation of the norm
+        double norm = trapezoidalRule(0, this->nbox, dx, probability);
+
+        // Normalization of the wavefunction
+        for (int i = 0; i <= nbox; i++) {
+            double &value = wavefunction[i];
+            value /= sqrt(norm);
+        }
+
+        // Normalization of the potential
+        for (int i = 0; i <= nbox; i++) {
+            double &value = probability[i];
+            value /= norm;
+        }
+
+        // Temporary to make it work with continuous basis
+        std::vector<std::vector<double>> temp;
+        temp.push_back(local_potential);
+
+        std::vector<double> coords =this->potential.getBase().getContinuous().at(number_of_dimension).getCoords(); 
+        Base basis = Base(coords);
+        number_of_dimension++;
+        states.push_back(State(wavefunction, probability, temp, solutionEnergy, basis, nbox));
+
     }
 
     // Get the resulting state
-
-    return states.at(0);
+    State s = State(states);
+    return s;
 }
 
 /*! Applies a bisection algorith to the numerov method to find

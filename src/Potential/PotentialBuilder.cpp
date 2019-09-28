@@ -20,9 +20,9 @@ Potential::Builder::Builder(const std::string& filename) {
             rowStreamer >> singleBaseCoord >> singlePotentialValue;
 
             baseCoords.push_back(singleBaseCoord);
-            this->potentialValues.push_back(singlePotentialValue);
+            potentialValues.push_back(singlePotentialValue);
         }
-
+        this->values.push_back(potentialValues);
         this->base = Base(baseCoords);
     } catch (const std::ifstream::failure& e) {
         ERROR("Exception opening/reading file: {}", e.what());
@@ -69,15 +69,6 @@ Potential::Builder Potential::Builder::setType(PotentialType type) {
     return *this;
 }
 
-Potential::Builder Potential::Builder::setSeparable(bool separable) {
-    if (this->fromFile) {
-        throw std::invalid_argument("Cannot read options from file");
-    }
-
-    this->separable = separable;
-    return *this;
-}
-
 Potential::Builder Potential::Builder::setBase(Base b) {
     if (this->fromFile) {
         throw std::invalid_argument("Cannot read options from file");
@@ -89,9 +80,8 @@ Potential::Builder Potential::Builder::setBase(Base b) {
 
 Potential Potential::Builder::build() {
     if (!this->fromFile) {
-        return Potential(this->base, this->type, this->k, this->width, this->height,
-                         this->separable);
+        return Potential(this->base, this->type, this->k, this->width, this->height);
     }
 
-    return Potential(this->base, this->potentialValues);
+    return Potential(this->base, this->values);
 }

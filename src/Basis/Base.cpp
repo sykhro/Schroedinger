@@ -41,27 +41,53 @@ Base::Base(basePreset t, int n_dimension, std::vector<ContinuousBase> c_base,
 
 std::ostream& operator<<(std::ostream& stream, Base& base) {
 
-    // Print continuous dimension values (if present)
-    if (!base.getContinuous().empty()) {
-        for (int i = 0; i < base.getContinuous().size(); i++) {
-            for (int coord_counter = 0; coord_counter < base.getContinuous().at(i).getCoords().size(); coord_counter++) {
-                stream << base.getContinuous().at(i).getCoords().at(coord_counter) << "; ";
-            }
-        }
+    std::vector<std::vector<double>> arr;
+    for (ContinuousBase c : base.getContinuous()) {
+        arr.push_back(c.getCoords());
     }
 
-    stream << "\n\n";
-
-    // Print discrete dimension values (if present)
-    //if (!base.getDiscrete().empty()) {
-    //    for (int i = 0; i < base.getContinuous().size(); i++) {
-    //        for (int coord_counter = 0; coord_counter < base.getDiscrete().at(i).getCoords().size();
-    //             coord_counter++) {
-    //            stream << base.getDiscrete().at(i).getCoords().at(coord_counter) << "; ";
-    //        }
-    //    }
-    //}
-
+    // number of arrays 
+    int n = arr.size(); 
+  
+    // to keep track of next element in each of 
+    // the n arrays 
+    int* indices = new int[n]; 
+  
+    // initialize with first element's index 
+    for (int i = 0; i < n; i++) 
+        indices[i] = 0; 
+  
+    while (1) { 
+  
+        // print current combination 
+        
+        for (int i = 0; i < n; i++) 
+            stream << arr[i][indices[i]] << " "; 
+        stream << "\n"; 
+  
+        // find the rightmost array that has more 
+        // elements left after the current element  
+        // in that array 
+        int next = n - 1; 
+        while (next >= 0 &&  
+              (indices[next] + 1 >= arr[next].size())) 
+            next--; 
+  
+        // no such array is found so no more  
+        // combinations left 
+        if (next < 0) 
+            break; 
+  
+        // if found move to next element in that  
+        // array 
+        indices[next]++; 
+  
+        // for all arrays to the right of this  
+        // array current index again points to  
+        // first element 
+        for (int i = next + 1; i < n; i++) 
+            indices[i] = 0; 
+    } 
     return stream;
 }
 
@@ -88,6 +114,17 @@ std::ostream& operator<<(std::ostream& stream, Base& base) {
         return base;
 
     }
+
+    Base& Base::operator += (Base& base2) {
+        for (int i = 0; i < base2.getDiscrete().size(); i++)
+            this->discrete.push_back(base2.getDiscrete().at(i));
+
+        for (int i = 0; i < base2.getContinuous().size(); i++)
+            this->continuous.push_back(base2.getContinuous().at(i));  
+
+        // You have to upload also the dimension HERE
+        return *this;
+}
 
 // This method let you get basis coords when it has only one dimension
 std::vector<double> Base::getCoords() {

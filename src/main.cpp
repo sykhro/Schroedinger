@@ -136,7 +136,6 @@ void harmonic_oscillator_2D_example() {
 
     Potential::Builder potentialBuilder(base);
     Potential V = potentialBuilder.setType(Potential::PotentialType::HARMONIC_OSCILLATOR)
-                      .setSeparable(true)
                       .setK(k)
                       .build();
 

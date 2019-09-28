@@ -37,12 +37,12 @@ void testWavefunction(unsigned int nbox, Potential::PotentialType potType, doubl
             exit(8);
     }
 
-    if (analytic_Wf.size() == numerov_Wf.size()) {
+    //if (analytic_Wf.size() == numerov_Wf.size()) {
         for (int i = 0; i < analytic_Wf.size(); i++)
-            EXPECT_NEAR(numerov_Wf.at(i), analytic_Wf.at(i), 1e-2);  // improve error definition
-    } else
-        FAIL() << "Analytic wavefunction and Numerov wavefunction haven't the same size "
-               << analytic_Wf.size() << " " << numerov_Wf.size();
+            ASSERT_NEAR(numerov_Wf.at(i), analytic_Wf.at(i), 1e-2);  // improve error definition
+    //} //else
+    //    FAIL() << "Analytic wavefunction and Numerov wavefunction haven't the same size "
+    //           << analytic_Wf.size() << " " << numerov_Wf.size();
 
     ASSERT_NEAR(E_numerov, E_analytic, 1e-3);
 

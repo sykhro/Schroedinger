@@ -43,17 +43,18 @@ class Potential {
     };
 
     Potential();
-    Potential(Base base, std::vector<double> potentialValues);
-    Potential(Base, PotentialType, double, double, double, bool);
+    Potential(Base base, std::vector<std::vector<double>> potentialValues);
+    Potential(Base, PotentialType, double, double, double);
 
-    const std::vector<double>& getValues() { return this->v; }
-
-    std::vector<Potential> getSeparatedPotentials();
+    const std::vector<std::vector<double>>& getValues() { return this->values; }
 
     Base getBase();
     void printToFile();
-    bool isSeparated();
+
+    //bool isSeparated(); assuming always separable potentials
     friend std::ostream& operator<<(std::ostream& stream, Potential& potential);
+    friend const Potential operator+(Potential& potential1, Potential& potential2);
+    Potential& operator+=(Potential& potential2);
 
     class Builder {
       private:
@@ -64,8 +65,7 @@ class Potential {
         double height      = 10.0;
         bool separable     = false;
         bool fromFile      = false;
-        std::vector<Potential> separated_potentials;
-        std::vector<double> potentialValues;
+        std::vector<std::vector<double>> values;
 
       public:
         Builder(Base b);
@@ -75,20 +75,17 @@ class Potential {
         Builder setHeight(double height_new);
         Builder setType(PotentialType type);
         Builder setBase(Base b);
-        Builder setSeparable(bool separable);
         Potential build();
     };
 
   private:
     Base base;
-    std::vector<double> v;
+    std::vector<std::vector<double>> values;
     PotentialType type;
 
     double k;
     double width;
     double height;
-    bool separable;
-    std::vector<Potential> separated_potentials;
 
     void ho_potential();
     void box_potential();

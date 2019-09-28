@@ -2,43 +2,76 @@
 
 #include <utility>
 
-State::State(std::vector<double> wavefunction, Potential potential, double energy, Base base, int nbox) {
+State::State(std::vector<double> wavefunction, std::vector<double> probability, std::vector<std::vector<double>> potential, double energy, Base base, int nbox) {
 
-        double norm = 0.0;
-        this->potential = potential;
-        this->nbox = nbox;
-
-        this->probability = std::vector<double>(nbox + 1);
-
-        // Evaluation of the probability
-        for (int i = 0; i <= nbox; i++) {
-            double &value      = wavefunction[i];
-            double &prob_value = probability[i];
-            prob_value         = value * value;
-        }
-
-        // Evaluation of the norm
-        norm = trapezoidalRule(0, nbox, dx, probability);
-
-        // Normalization of the wavefunction
-        for (int i = 0; i <= nbox; i++) {
-            double &value = wavefunction[i];
-            value /= sqrt(norm);
-        }
-
-        // Normalization of the potential
-        for (int i = 0; i <= nbox; i++) {
-            double &value = probability[i];
-            value /= norm;
-        }
-    this->wavefunction = std::move(wavefunction);
-    this->probability  = std::move(probability);
-    this->base         = std::move(base);
+    double norm = 0.0;
+    this->potential = Potential(base, potential);
+    this->nbox = nbox;
+    this->probability  = probability;
+    this->wavefunction = wavefunction;
+    this->base         = base;
     this->energy       = energy;
+}
+
+State::State(std::vector<State> states) {
+    std::vector<Base> bases;
+    std::vector<std::vector<double>> wavefunctions = std::vector<std::vector<double>>();
+    std::vector<std::vector<double>> probabilities = std::vector<std::vector<double>>();
+    std::vector<Potential> potentials = std::vector<Potential>();
+
+    for (State local_state : states) {
+        bases.push_back(local_state.getBase());
+        wavefunctions.push_back(local_state.getWavefunction());
+        potentials.push_back(local_state.getPotential());
+        probabilities.push_back(local_state.getProbability());
+    }
+
+    for (Base b : bases) {
+        this->base += b;
+    }
+
+    for (Potential p: potentials) {
+        this->potential += p;
+    }
+
+    // Save W(a, ..., z)
+    int n = wavefunctions.size(); 
+    int* indices = new int[n]; 
+  
+    for (int i = 0; i < n; i++) 
+        indices[i] = 0; 
+  
+    while (1) { 
+  
+        // print current combination 
+        double sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += wavefunctions[i][indices[i]];
+        } 
+        this->wavefunction.push_back(sum);
+        
+        int next = n - 1; 
+        while (next >= 0 &&  
+              (indices[next] + 1 >= wavefunctions[next].size())) 
+            next--; 
+  
+        if (next < 0) 
+            break; 
+  
+        indices[next]++; 
+  
+        for (int i = next + 1; i < n; i++) 
+            indices[i] = 0; 
+    } 
+
+    // Maybe we should check probability here
+    this->probability = probabilities.at(0);
 }
 
 const std::vector<double> &State::getWavefunction() { return this->wavefunction; }
 const std::vector<double> &State::getProbability() { return this->probability; }
+const Potential &State::getPotential() { return this->potential; }
+
 const double &State::getEnergy() { return this->energy; }
 
 void State::printToFile() {
@@ -47,7 +80,6 @@ void State::printToFile() {
     std::ofstream probabilityfile("probability.dat");
 
     if (wavefunctionfile.is_open() && probabilityfile.is_open() && basefile.is_open()) {
-        std::vector<double> base_coords = this->base.getCoords();
 
         for (double wavefunction_element : wavefunction)
             wavefunctionfile << wavefunction_element << std::endl;
@@ -73,7 +105,8 @@ std::ostream &operator<<(std::ostream &stream, const State &st) {
     for (int i = 0; i < base_coords.size(); i++) {
 
         // Printing coord
-        stream << std::setprecision(3) << std::setw(20) << std::right << base_coords[i];
+        Base base = st.getBase();
+        stream << base;
 
         // Printing wavefunction
         stream << std::setprecision(3) << std::setw(20) << std::right << st.wavefunction[i];
@@ -85,32 +118,5 @@ std::ostream &operator<<(std::ostream &stream, const State &st) {
 
     return stream;
 }
-
-State operator^ (State& state_1, State& state_2) {
-        Base base_1 = state_1.getBase();
-        Base base_2 = state_2.getBase();
-        Base base = base_1 + base_2;
-
-        std::vector<double> wavefunction = std::vector<double>(
-                                                state_1.wavefunction.size() * state_2.wavefunction.size()
-                                            );
-
-        std::vector<double> potential = std::vector<double>(
-                                                state_1.potential.getValues().size() * state_2.potential.getValues().size()
-        );
-        
-        for (int i = 0; i < state_1.wavefunction.size(); i++)
-            for (int j = 0; j < state_2.wavefunction.size(); j++)
-                wavefunction.push_back(state_1.wavefunction.at(i) * state_2.wavefunction.at(j));
-
-        for (int i = 0; i < state_1.potential.getValues().size(); i++)
-            for (int j = 0; j < state_2.potential.getValues().size(); j++)
-                potential.push_back(state_1.potential.getValues().at(i) + state_2.potential.getValues().at(j));
-
-        double energy = state_1.getEnergy() + state_2.getEnergy();
-        
-        Potential final_potential = Potential(base, potential);
-        return State(wavefunction, final_potential, energy, base, state_1.nbox);
-};
 
 
