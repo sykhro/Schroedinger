@@ -29,7 +29,8 @@ class Numerov : public Solver {
   public:
     Numerov(Potential potential, int nbox);
     State solve(double, double, double);
-  /*! Integrate with the trapezoidal rule method, from a to b position in a function array*/
+
+    /*! Integrate with the trapezoidal rule method, from a to b position in a function array*/
     static double trapezoidalRule(int a, int b, double stepx, std::vector<double> function) {
         double sum = 0.0;
         for (int j = a + 1; j < b; j++) sum += function.at(j);
@@ -37,11 +38,11 @@ class Numerov : public Solver {
         sum = (sum)*stepx;
         return sum;
     }
+
   private:
-    void functionSolve(double energy, std::vector<double> potential_values, std::vector<double> &wavefunction);
-    double bisection(double e_min, double e_max, std::vector<double> potential_values, std::vector<double> &wavefunction,  double wfAtBoundary);
-
-
+    void functionSolve(double energy, int potential_index);
+    double bisection(double, double, int potential_index);
+    void initialize();
 };
 
 #endif

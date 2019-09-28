@@ -36,8 +36,8 @@ void Potential::ho_potential() {
 
     for (ContinuousBase b : this->base.getContinuous()) {
         std::vector<double> x = b.getCoords();
-        std::vector<double> v = std::vector<double>(b.getCoords().size());
-        std::fill(v.begin(), v.end(), 0.0);
+        std::vector<double> v = std::vector<double>(b.getCoords().size(), 0);
+
         int i = 0;
         for (double value : x) {
             v[i] = (value * value * this->k);
@@ -51,6 +51,7 @@ void Potential::ho_potential() {
         std::vector<int> x = b.getCoords();
         std::vector<double> v(x.begin(), x.end());
         std::fill(v.begin(), v.end(), 0.0);
+        
         int i = 0;
         for (double value : x) {
             v[i] = (value * value * this->k);
@@ -81,11 +82,10 @@ void Potential::box_potential() {
 void Potential::finite_well_potential() {
 
     for (ContinuousBase b : this->base.getContinuous()) {
-        std::vector<double> x = b.getCoords();
         std::vector<double> v = std::vector<double>(b.getCoords().size(), 0);
 
         int i = 0;
-        for (double value : x) {
+        for (double value : b.getCoords()) {
             v[i] = (value > -this->width / 2.0 && value < this->width / 2.0) ? 0.0 : this->height;
             i++;
         }

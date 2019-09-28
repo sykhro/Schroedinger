@@ -10,15 +10,21 @@ void testWavefunction(unsigned int nbox, Potential::PotentialType potType, doubl
                       double height, Base base, std::vector<double> &pot,
                       std::vector<double> &numerov_Wf, std::vector<double> &analytic_Wf) {
 
+    double e_min      = 0.0;
+    double e_max      = 2.0;
+    double e_step     = 0.01;
+
     Potential::Builder b(base);
     Potential V = b.setType(potType).setK(k).setHeight(height).setWidth(width).build();
 
     Numerov solver = Numerov(V, nbox);
-    State state    = solver.solve(0.0, 2.0, 0.01);
+    State state    = solver.solve(e_min, e_max, e_step);
 
     numerov_Wf  = state.getWavefunction();
     analytic_Wf = numerov_Wf;
 
+    Potential p = state.getPotential();
+    pot = p.getValues().at(0);
     double E_numerov = state.getEnergy();
     double E_analytic;
 

@@ -15,26 +15,33 @@ State::State(std::vector<double> wavefunction, std::vector<double> probability, 
 
 State::State(std::vector<State> states) {
     std::vector<Base> bases;
-    std::vector<std::vector<double>> wavefunctions = std::vector<std::vector<double>>();
-    std::vector<std::vector<double>> probabilities = std::vector<std::vector<double>>();
-    std::vector<Potential> potentials = std::vector<Potential>();
-
+    this->wavefunction = std::vector<double>();
+    std::vector<double> energies;
+    std::vector<std::vector<double>> wavefunctions;
+    std::vector<std::vector<double>> probabilities; //= std::vector<std::vector<double>>(states.size());
+    std::vector<Potential> potentials;// = std::vector<Potential>(states.size());
     for (State local_state : states) {
         bases.push_back(local_state.getBase());
         wavefunctions.push_back(local_state.getWavefunction());
         potentials.push_back(local_state.getPotential());
         probabilities.push_back(local_state.getProbability());
+        energies.push_back(local_state.getEnergy());
+
     }
 
     for (Base b : bases) {
         this->base += b;
     }
-
+    
     for (Potential p: potentials) {
         this->potential += p;
     }
 
-    // Save W(a, ..., z)
+    for (double en : energies) {
+        this->energy += en;
+    }
+
+    // Save W(a, ..., z) = W(a) * ... * W(z)
     int n = wavefunctions.size(); 
     int* indices = new int[n]; 
   
@@ -44,10 +51,11 @@ State::State(std::vector<State> states) {
     while (1) { 
   
         // print current combination 
-        double sum = 0;
+        double sum = 1.0;
         for (int i = 0; i < n; i++) {
-            sum += wavefunctions[i][indices[i]];
+            sum *= wavefunctions[i][indices[i]];
         } 
+
         this->wavefunction.push_back(sum);
         
         int next = n - 1; 
@@ -66,6 +74,7 @@ State::State(std::vector<State> states) {
 
     // Maybe we should check probability here
     this->probability = probabilities.at(0);
+
 }
 
 const std::vector<double> &State::getWavefunction() { return this->wavefunction; }
