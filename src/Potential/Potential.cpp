@@ -29,7 +29,6 @@ Potential::Potential(Base base, PotentialType type, double k, double width, doub
         default:
             throw std::invalid_argument("Wrong potential type or initialization meaningless!");
     }
-    this->printToFile();
 }
 
 void Potential::ho_potential() {

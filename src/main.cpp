@@ -149,6 +149,8 @@ void harmonic_oscillator_2D_example() {
 
     // Save to file wavefunction and probability
     state.printToFile();
+    V.printToFile();
+
 }
 
 void custom_workflow() {

@@ -26,6 +26,8 @@ TEST(Potentials, createAndReadFromFile) {
     Potential::Builder potentialBuilder(base);
     Potential V =
         potentialBuilder.setType(Potential::PotentialType::HARMONIC_OSCILLATOR).setK(k).build();
+    
+    V.printToFile();
 
     // Istantiate a potential builder giving a filename in the constructor
     // then get a potential object calling the build method

@@ -27,6 +27,7 @@ Potential::Builder::Builder(const std::string& filename) {
     } catch (const std::ifstream::failure& e) {
         ERROR("Exception opening/reading file: {}", e.what());
     }
+    
 }
 
 Potential::Builder Potential::Builder::setK(double k_new) {
