@@ -122,8 +122,8 @@ void harmonic_oscillator_example() {
 
 void harmonic_oscillator_2D_example() {
     unsigned int nbox = 1000;
-    double mesh       = 0.1;
-    double k          = 0.5;
+    double mesh       = 0.01;
+    double k          = 1.0;
     double energy     = 0.0;
     double e_min      = 0.0;
     double e_max      = 2.0;
