@@ -13,8 +13,8 @@ class ContinuousBase {
     ContinuousBase(double, double, double);
     ContinuousBase(double, double, unsigned int);
 
-    std::vector<double> getCoords() const { return this->coords; }
-	
+    const std::vector<double>& getCoords() const { return this->coords; }
+
   private:
     double start, end, mesh, nbox;
     std::vector<double> coords;

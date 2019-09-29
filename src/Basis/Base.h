@@ -19,16 +19,15 @@ class Base {
     Base(basePreset, int, std::vector<ContinuousBase>, std::vector<DiscreteBase>);
     Base(const std::vector<double>& coords);
 
-    int getDim() { return this->dimensions; };
-    boundaryCondition getBoundary() { return this->boundary; };
-    const std::vector<ContinuousBase>& getContinuous() const { return this->continuous; };
-    const std::vector<DiscreteBase>& getDiscrete() const { return this->discrete; };
+    int getDim() const noexcept { return this->dimensions; };
+    boundaryCondition getBoundary() const noexcept { return this->boundary; };
+    const std::vector<ContinuousBase>& getContinuous() const noexcept { return this->continuous; };
+    const std::vector<DiscreteBase>& getDiscrete() const noexcept { return this->discrete; };
 
     std::vector<double> getCoords() const;
-    friend const Base operator+(Base& base1, Base& base2);
+    friend const Base operator+(const Base& base1, const Base& base2);
     friend std::string toString(Base& base);
 	
-	Base& operator+=(Base& base2);
     Base& operator+=(const Base& base2);
 
   private:

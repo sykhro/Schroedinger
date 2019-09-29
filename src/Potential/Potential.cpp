@@ -148,11 +148,9 @@ std::ostream& operator<<(std::ostream& stream, Potential& potential) {
     return stream;
 }
 
-Base Potential::getBase() { return this->base; }
-
 // Create a potential having all vectors of both potentials
-const Potential operator+(Potential& potential1, Potential& potential2) {
-    std::vector<std::vector<double>> potential_values = std::vector<std::vector<double>>();
+const Potential operator+(const Potential& potential1, const Potential& potential2) {
+    std::vector<std::vector<double>> potential_values{};
 
     for (std::vector<double> dimensions : potential1.getValues())
         potential_values.push_back(dimensions);
@@ -160,23 +158,10 @@ const Potential operator+(Potential& potential1, Potential& potential2) {
     for (std::vector<double> dimensions : potential2.getValues())
         potential_values.push_back(dimensions);
 
-    Base base1      = potential1.getBase();
-    Base base2      = potential2.getBase();
-    Base final_base = base1 + base2;
-
-    const Potential& final_potential = Potential(final_base, potential_values);
-    return final_potential;
-}
-
-Potential& Potential::operator+=(Potential& potential2) {
-
-    for (std::vector<double> vals : potential2.getValues()) this->values.push_back(vals);
-
-    return *this;
+    return {potential1.getBase() + potential2.getBase(), potential_values};
 }
 
 Potential& Potential::operator+=(const Potential& potential2) {
-
     for (std::vector<double> vals : potential2.getValues()) this->values.push_back(vals);
 
     return *this;

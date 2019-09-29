@@ -10,7 +10,7 @@ class DiscreteBase {
   public:
     DiscreteBase(int, int, int);
 
-    std::vector<int> getCoords() const { return this->coords; }
+    const std::vector<int>& getCoords() const { return this->coords; }
 
   private:
     int start, end, step;

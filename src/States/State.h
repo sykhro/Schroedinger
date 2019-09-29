@@ -31,7 +31,6 @@ class State {
     friend std::ostream& operator<<(std::ostream& stream, const State& state);
 
   private:
-    
     int nbox{};
     double energy{};
 

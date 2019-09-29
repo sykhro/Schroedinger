@@ -45,15 +45,14 @@ class Potential {
     Potential(Base base, std::vector<std::vector<double>> potentialValues);
     Potential(Base, PotentialType, double, double, double);
 
-    const std::vector<std::vector<double>>& getValues() const { return this->values; }
+    const std::vector<std::vector<double>>& getValues() const noexcept { return this->values; }
+    const Base& getBase() const noexcept { return base; };
 
-    Base getBase();
-    void printToFile();
+	void printToFile();
 
     //bool isSeparated(); assuming always separable potentials
     friend std::ostream& operator<<(std::ostream& stream, Potential& potential);
-    friend const Potential operator+(Potential& potential1, Potential& potential2);
-    Potential& operator+=(Potential& potential2);
+    friend const Potential operator+(const Potential& potential1, const Potential& potential2);
     Potential& operator+=(const Potential& potential2);
 
 

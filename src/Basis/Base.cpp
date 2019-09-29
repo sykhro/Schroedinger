@@ -43,7 +43,7 @@ Base::Base(basePreset t, int n_dimension, std::vector<ContinuousBase> c_base,
 std::string toString(Base& base) {
     std::vector<std::vector<double>> arr;
     for (auto& c : base.getContinuous()) {
-        arr.emplace_back(std::move(c.getCoords()));
+        arr.emplace_back(c.getCoords());
     }
 
 	// number of arrays
@@ -82,7 +82,7 @@ std::string toString(Base& base) {
     return to_string(writer);
 }
 
-const Base operator+(Base& base1, Base& base2) {
+const Base operator+(const Base& base1, const Base& base2) {
     std::vector<DiscreteBase> discrete_dimension{};
     discrete_dimension.insert(discrete_dimension.begin(), base1.getDiscrete().begin(),
                               base1.getDiscrete().end());
@@ -97,17 +97,6 @@ const Base operator+(Base& base1, Base& base2) {
 
     return {Base::basePreset::Custom, (base1.getDim() + base2.getDim()), continuous_dimension,
             discrete_dimension};
-}
-
-Base& Base::operator+=(Base& base2) {
-    discrete.insert(discrete.begin(), base2.getDiscrete().begin(),
-                              base2.getDiscrete().end());
-
-    continuous.insert(continuous.begin(), base2.getContinuous().begin(),
-                                base2.getContinuous().end());
-    
-    // You have to upload also the dimension HERE
-    return *this;
 }
 
 Base& Base::operator+=(const Base& base2) {
