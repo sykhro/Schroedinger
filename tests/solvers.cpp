@@ -79,7 +79,7 @@ TEST(Wavefunction_and_energy, Numerov_HarmonicOscillator) {
     if (HasFailure()) {
         for (int i = 0; i < nbox; i++)
             std::cout << i << " " << numerov_Wf[i] << " " << analytic_Wf[i] << " " << pot[i] << " "
-                      << analytic_Wf[i] - numerov_Wf[i] << std::endl;
+                      << analytic_Wf[i] - numerov_Wf[i] << '\n';
     }
 }
 
@@ -99,7 +99,7 @@ TEST(Wavefunction_and_energy, Numerov_HarmonicOscillator2) {
     if (HasFailure()) {
         for (int i = 0; i < nbox; i++)
             std::cout << i << " " << numerov_Wf[i] << " " << analytic_Wf[i] << " " << pot[i] << " "
-                      << analytic_Wf[i] - numerov_Wf[i] << std::endl;
+                      << analytic_Wf[i] - numerov_Wf[i] << '\n';
     }
 }
 
@@ -121,7 +121,7 @@ TEST(Wavefunction_and_energy, Numerov_Box) {
     if (HasFailure()) {
         for (int i = 0; i < nbox; i++)
             std::cout << i << " " << numerov_Wf[i] << " " << analytic_Wf[i] << " " << pot[i] << " "
-                      << analytic_Wf[i] - numerov_Wf[i] << std::endl;
+                      << analytic_Wf[i] - numerov_Wf[i] << '\n';
     }
 }
 
@@ -143,7 +143,7 @@ TEST(Wavefunction_and_energy, Numerov_Box2) {
     if (HasFailure()) {
         for (int i = 0; i < nbox; i++)
             std::cout << i << " " << numerov_Wf[i] << " " << analytic_Wf[i] << " " << pot[i] << " "
-                      << analytic_Wf[i] - numerov_Wf[i] << std::endl;
+                      << analytic_Wf[i] - numerov_Wf[i] << '\n';
     }
 }
 
@@ -165,7 +165,7 @@ TEST(Wavefunction_and_energy, Numerov_FiniteWell1) {
     if (HasFailure()) {
         for (int i = 0; i < nbox; i++)
             std::cout << i << " " << numerov_Wf[i] << " " << analytic_Wf[i] << " " << pot[i] << " "
-                      << analytic_Wf[i] - numerov_Wf[i] << std::endl;
+                      << analytic_Wf[i] - numerov_Wf[i] << '\n';
     }
 }
 
@@ -186,6 +186,6 @@ TEST(Wavefunction_and_energy, Numerov_FiniteWell2) {
     if (HasFailure()) {
         for (int i = 0; i < nbox; i++)
             std::cout << i << " " << numerov_Wf[i] << " " << analytic_Wf[i] << " " << pot[i] << " "
-                      << analytic_Wf[i] - numerov_Wf[i] << std::endl;
+                      << analytic_Wf[i] - numerov_Wf[i] << '\n';
     }
 }

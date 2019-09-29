@@ -2,18 +2,11 @@
 
 #include <utility>
 
-Potential::Potential() = default;
-Potential::Potential(Base base, std::vector<std::vector<double>> potentialValues) {
-    this->base      = std::move(base);
-    this->values    = std::move(potentialValues);
-}
+Potential::Potential(Base i_base, std::vector<std::vector<double>> potentialValues)
+    : base(std::move(i_base)), values(std::move(potentialValues)) {}
 
-Potential::Potential(Base base, PotentialType type, double k, double width, double height) {
-    this->base      = base;
-    this->k         = k;
-    this->width     = width;
-    this->height    = height;
-    this->type      = type;
+Potential::Potential(Base i_base, PotentialType i_type, double i_k, double i_width, double i_height)
+    : base(std::move(i_base)), type(i_type), k(i_k), width(i_width), height(i_height) {
 
     // Evaluation
     switch (type) {
@@ -50,7 +43,7 @@ void Potential::ho_potential() {
         std::vector<int> x = b.getCoords();
         std::vector<double> v(x.begin(), x.end());
         std::fill(v.begin(), v.end(), 0.0);
-        
+
         int i = 0;
         for (double value : x) {
             v[i] = (value * value * this->k);
@@ -75,7 +68,6 @@ void Potential::box_potential() {
         std::fill(v.begin(), v.end(), 0.0);
         this->values.push_back(v);
     }
-
 }
 
 void Potential::finite_well_potential() {
@@ -114,49 +106,44 @@ void Potential::printToFile() {
 
 std::ostream& operator<<(std::ostream& stream, Potential& potential) {
     std::vector<std::vector<double>> arr = potential.getValues();
-    // number of arrays 
-    int n = arr.size(); 
-  
-    // to keep track of next element in each of 
-    // the n arrays 
-    int* indices = new int[n]; 
-  
-    // initialize with first element's index 
-    for (int i = 0; i < n; i++) 
-        indices[i] = 0; 
-  
-    while (1) { 
-  
-        // print current combination 
+    // number of arrays
+    int n = arr.size();
+
+    // to keep track of next element in each of
+    // the n arrays
+    int* indices = new int[n];
+
+    // initialize with first element's index
+    for (int i = 0; i < n; i++) indices[i] = 0;
+
+    while (1) {
+
+        // print current combination
         double sum = 0;
         for (int i = 0; i < n; i++) {
             sum += arr[i][indices[i]];
-        } 
-        stream << sum << " " << std::endl; 
-  
-        // find the rightmost array that has more 
-        // elements left after the current element  
-        // in that array 
-        int next = n - 1; 
-        while (next >= 0 &&  
-              (indices[next] + 1 >= arr[next].size())) 
-            next--; 
-  
-        // no such array is found so no more  
-        // combinations left 
-        if (next < 0) 
-            break; 
-  
-        // if found move to next element in that  
-        // array 
-        indices[next]++; 
-  
-        // for all arrays to the right of this  
-        // array current index again points to  
-        // first element 
-        for (int i = next + 1; i < n; i++) 
-            indices[i] = 0; 
-    } 
+        }
+        stream << sum << " " << '\n';
+
+        // find the rightmost array that has more
+        // elements left after the current element
+        // in that array
+        int next = n - 1;
+        while (next >= 0 && (indices[next] + 1 >= arr[next].size())) next--;
+
+        // no such array is found so no more
+        // combinations left
+        if (next < 0) break;
+
+        // if found move to next element in that
+        // array
+        indices[next]++;
+
+        // for all arrays to the right of this
+        // array current index again points to
+        // first element
+        for (int i = next + 1; i < n; i++) indices[i] = 0;
+    }
 
     return stream;
 }
@@ -173,18 +160,24 @@ const Potential operator+(Potential& potential1, Potential& potential2) {
     for (std::vector<double> dimensions : potential2.getValues())
         potential_values.push_back(dimensions);
 
-    Base base1 = potential1.getBase();
-    Base base2 = potential2.getBase();
+    Base base1      = potential1.getBase();
+    Base base2      = potential2.getBase();
     Base final_base = base1 + base2;
 
     const Potential& final_potential = Potential(final_base, potential_values);
     return final_potential;
 }
 
-    Potential& Potential::operator+=(Potential& potential2) {
+Potential& Potential::operator+=(Potential& potential2) {
 
-        for (std::vector<double> vals : potential2.getValues())
-            this->values.push_back(vals);
+    for (std::vector<double> vals : potential2.getValues()) this->values.push_back(vals);
 
-        return *this;
-    }
+    return *this;
+}
+
+Potential& Potential::operator+=(const Potential& potential2) {
+
+    for (std::vector<double> vals : potential2.getValues()) this->values.push_back(vals);
+
+    return *this;
+}

@@ -47,7 +47,7 @@ void Numerov::functionSolve(double energy, int potential_index) {
             value /= (1.0 + (c) * (energy - pot_a));
         }
     } catch (const std::out_of_range &ex) {
-        ERROR("Out of range exception caught, {}", ex.what());
+        S_ERROR("Out of range exception caught, {}", ex.what());
     }
 }
 
@@ -84,7 +84,7 @@ State Numerov::solve(double e_min, double e_max, double e_step) {
             double &last_wavefunction_value = this->wavefunction.at(this->nbox);
 
             if (fabs(last_wavefunction_value - this->wfAtBoundary) < err_thres) {
-                INFO("Solution found {}", last_wavefunction_value);
+                S_INFO("Solution found {}", last_wavefunction_value);
                 this->solutionEnergy = energy;
                 break;
             }
@@ -96,7 +96,7 @@ State Numerov::solve(double e_min, double e_max, double e_step) {
             // when the sign changes, means that the solution for f[nbox]=0 is in in the middle, thus
             // calls bisection rule.
             if (sign * (last_wavefunction_value - this->wfAtBoundary) < 0) {
-                INFO("Bisection {}", last_wavefunction_value);
+                S_INFO("Bisection {}", last_wavefunction_value);
                 this->solutionEnergy = this->bisection(energy - e_step, energy + e_step, potential_index);
                 break;
             }
@@ -131,7 +131,7 @@ State Numerov::solve(double e_min, double e_max, double e_step) {
                  basis, this->nbox));
 
     }
-    State state = State(states); 
+    State state = makeStateFromVector(states); 
     return state;
 }
 
@@ -172,7 +172,7 @@ double Numerov::bisection(double e_min, double e_max, int potential_index) {
         }
     }
 
-    WARN("Failed to find solution using bisection method, {} > {}", wavefunction.at(nbox),
+    S_WARN("Failed to find solution using bisection method, {} > {}", wavefunction.at(nbox),
          err_thres);
     return energy_middle;
 }

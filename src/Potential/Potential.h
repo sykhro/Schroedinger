@@ -42,11 +42,10 @@ class Potential {
         FINITE_WELL_POTENTIAL = 2,
     };
 
-    Potential();
     Potential(Base base, std::vector<std::vector<double>> potentialValues);
     Potential(Base, PotentialType, double, double, double);
 
-    const std::vector<std::vector<double>>& getValues() { return this->values; }
+    const std::vector<std::vector<double>>& getValues() const { return this->values; }
 
     Base getBase();
     void printToFile();
@@ -55,6 +54,8 @@ class Potential {
     friend std::ostream& operator<<(std::ostream& stream, Potential& potential);
     friend const Potential operator+(Potential& potential1, Potential& potential2);
     Potential& operator+=(Potential& potential2);
+    Potential& operator+=(const Potential& potential2);
+
 
     class Builder {
       private:

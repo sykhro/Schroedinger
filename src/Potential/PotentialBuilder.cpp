@@ -3,7 +3,7 @@
 #include "LogManager.h"
 #include "Potential.h"
 
-Potential::Builder::Builder(Base b) { this->base = std::move(b); }
+Potential::Builder::Builder(Base b) : base(std::move(b)) {}
 
 Potential::Builder::Builder(const std::string& filename) {
     this->fromFile = true;
@@ -25,7 +25,7 @@ Potential::Builder::Builder(const std::string& filename) {
         this->values.push_back(potentialValues);
         this->base = Base(baseCoords);
     } catch (const std::ifstream::failure& e) {
-        ERROR("Exception opening/reading file: {}", e.what());
+        S_ERROR("Exception opening/reading file: {}", e.what());
     }
     
 }
