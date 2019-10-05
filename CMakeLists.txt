@@ -29,6 +29,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 # Build options
 option(ENABLE_ASAN "Enable address sanitizer" OFF)
 option(ENABLE_TESTS "Enable unit testing" ON)
+option(ENABLE_UI_QT "Build the Qt UI (experimental)" ON)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
   message(FATAL_ERROR "Schroedinger requires gcc 8.0 (found ${CMAKE_CXX_COMPILER_VERSION})")

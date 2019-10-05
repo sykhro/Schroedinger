@@ -1,4 +1,3 @@
-
 /*
  * Schroedinger - Scienza (c) 2019
  * Licensed under the LGPL 2.1; see the included LICENSE for details
